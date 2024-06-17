@@ -1,0 +1,80 @@
+---
+title: "Analysis of Bad Drivers Dataset"
+author: "LEI SUN"
+date: "2024-06-16"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 1
+This dataset provides information on bad drivers across all states in the USA. It includes various metrics such as the number of drivers involved in fatal collisions per billion miles, percentage of drivers involved in fatal collisions who were speeding, percentage of drivers involved in fatal collisions who were alcohol-impaired, percentage of drivers involved in fatal collisions who were not distracted, percentage of drivers involved in fatal collisions who had not been involved in any previous accidents, car insurance premiums, and losses incurred by insurance companies for collisions per insured driver.
+
+The data is sourced from the National Highway Traffic Safety Administration spanning from 2009 to 2012. It is stored in CSV format, a delimited flat file using commas as separators. This dataset could help answer questions such as identifying the top 5 states with the highest rates of bad drivers or exploring correlations between driving behavior and insurance costs. CSV files are commonly opened in software like Excel for analysis.
+
+# Section 2
+```{r, echo = TRUE,message=FALSE}
+# Comments: Used read_csv function from readr package.
+library(readr) 
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/bad-drivers/bad-drivers.csv" 
+bad_drivers <- read_csv(url)
+```
+# Section 3
+```{r, echo = TRUE,message=FALSE}
+library(dplyr)
+bad_drivers_cleaned <- bad_drivers %>%
+  select(
+    State,
+    `Number of drivers involved in fatal collisions per billion miles`,
+    `Percentage Of Drivers Involved In Fatal Collisions Who Were Speeding`,
+    `Percentage Of Drivers Involved In Fatal Collisions Who Were Alcohol-Impaired`
+  ) %>%
+  rename(`US State` = State)
+```
+
+# Section 4
+```{r, echo = TRUE,message=FALSE}
+library(knitr)
+column_descriptions <- data.frame(
+  `Column Name` = c("US State", "Number of drivers involved in fatal collisions per billion miles"),
+  `Description` = c(
+    "The state in the United States",
+    "The number of drivers involved in fatal collisions per billion miles driven"
+  )
+)
+
+```
+This dataframe has `r nrow(bad_drivers_cleaned)` rows and `r ncol(bad_drivers_cleaned)` columns.
+The names of the columns and a brief description of each are in the table below:
+```{r, echo = TRUE,message=FALSE}
+kable(column_descriptions, col.names = c("Column Name", "Description"))
+```
+
+
+
+# Section 5
+
+```{r summary-stats}
+#Subset
+selected_columns <- bad_drivers_cleaned[c("Number of drivers involved in fatal collisions per billion miles",
+                                          "Percentage Of Drivers Involved In Fatal Collisions Who Were Speeding",
+                                          "Percentage Of Drivers Involved In Fatal Collisions Who Were Alcohol-Impaired")]
+
+#Summary
+summary_stats <- summary(selected_columns)
+
+
+#New object
+summary_stats <- data.frame(
+  Minimum = apply(selected_columns, 2, min, na.rm = TRUE),
+  Maximum = apply(selected_columns, 2, max, na.rm = TRUE),
+  Mean = apply(selected_columns, 2, mean, na.rm = TRUE),
+  Missing = apply(selected_columns, 2, function(x) sum(is.na(x)))
+)
+
+# Print 
+summary_stats
+```
+
+
